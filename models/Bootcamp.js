@@ -8,7 +8,7 @@ const BootcamSchema = new mongoose.Schema({
     trim: true,
     maxlength: [50, "Name can not be more than 50 characters"],
   },
-  slug: string,
+  slug: String, // Corrected line
   description: {
     type: String,
     required: [true, "please add a description"],
