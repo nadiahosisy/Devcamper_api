@@ -1,18 +1,18 @@
 const mongoose = require("mongoose");
 
-const BootcamSchema = new mongoose.Schema({
+const BootcampSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "please add a name"],
+    required: [true, "Please add a name"],
     unique: true,
     trim: true,
-    maxlength: [50, "Name can not be more than 50 characters"],
+    maxlength: [50, "Name cannot be more than 50 characters"],
   },
-  slug: String, // Corrected line
+  slug: String,
   description: {
     type: String,
-    required: [true, "please add a description"],
-    maxlength: [500, "Name can not be more than 500 characters"],
+    required: [true, "Please add a description"],
+    maxlength: [500, "Description cannot be more than 500 characters"],
   },
   website: {
     type: String,
@@ -23,7 +23,7 @@ const BootcamSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    maxlength: [20, "Phone number can not be longer than 20 characters"],
+    maxlength: [20, "Phone number cannot be longer than 20 characters"],
   },
   email: {
     type: String,
@@ -40,12 +40,10 @@ const BootcamSchema = new mongoose.Schema({
     type: {
       type: String,
       enum: ["Point"],
-      required: true, // Ensure 'type' is required
     },
     coordinates: {
-      type: [Number], // Array of numbers [longitude, latitude]
-      index: "2dsphere", // Create a geospatial index for the 'coordinates' field
-      required: true, // Ensure 'coordinates' is required
+      type: [Number],
+      index: "2dsphere",
     },
     formattedAddress: String,
     street: String,
@@ -55,7 +53,6 @@ const BootcamSchema = new mongoose.Schema({
     country: String,
   },
   careers: {
-    // Array of strings
     type: [String],
     required: true,
     enum: [
@@ -70,7 +67,7 @@ const BootcamSchema = new mongoose.Schema({
   averageRating: {
     type: Number,
     min: [1, "Rating must be at least 1"],
-    max: [10, "Rating must can not be more than 10"],
+    max: [10, "Rating cannot be more than 10"],
   },
   averageCost: Number,
   photo: {
@@ -99,4 +96,4 @@ const BootcamSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Bootcamp", BootcamSchema);
+module.exports = mongoose.model("Bootcamp", BootcampSchema);
