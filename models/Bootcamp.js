@@ -21,4 +21,82 @@ const BootcamSchema = new mongoose.Schema({
       "Please use a valid URL with HTTP or HTTPS",
     ],
   },
+  phone: {
+    type: String,
+    maxlength: [20, "Phone number can not be longer than 20 characters"],
+  },
+  email: {
+    type: String,
+    match: [
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      "Please add a valid email",
+    ],
+  },
+  address: {
+    type: String,
+    required: [true, "Please add an address"],
+  },
+  location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      required: true, // Ensure 'type' is required
+    },
+    coordinates: {
+      type: [Number], // Array of numbers [longitude, latitude]
+      index: "2dsphere", // Create a geospatial index for the 'coordinates' field
+      required: true, // Ensure 'coordinates' is required
+    },
+    formattedAddress: String,
+    street: String,
+    city: String,
+    state: String,
+    zipcode: String,
+    country: String,
+  },
+  careers: {
+    // Array of strings
+    type: [String],
+    required: true,
+    enum: [
+      "Web Development",
+      "Mobile Development",
+      "UI/UX",
+      "Data Science",
+      "Business",
+      "Other",
+    ],
+  },
+  averageRating: {
+    type: Number,
+    min: [1, "Rating must be at least 1"],
+    max: [10, "Rating must can not be more than 10"],
+  },
+  averageCost: Number,
+  photo: {
+    type: String,
+    default: "no-photo.jpg",
+  },
+  housing: {
+    type: Boolean,
+    default: false,
+  },
+  jobAssistance: {
+    type: Boolean,
+    default: false,
+  },
+  jobGuarantee: {
+    type: Boolean,
+    default: false,
+  },
+  acceptGi: {
+    type: Boolean,
+    default: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
+
+module.exports = mongoose.model("Bootcamp", BootcamSchema);
