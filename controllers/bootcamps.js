@@ -30,7 +30,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   );
 
   // Finding resourse
-  query = Bootcamp.find(JSON.parse(quertStr));
+  query = Bootcamp.find(JSON.parse(quertStr)).populate("courses");
 
   //SELECT Fields
   if (req.query.select) {
@@ -140,22 +140,39 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
   }
 });
 
-//@desc       Delete bootcamp
-//@route      DELETE /api/vi/bootcamps/:id
-//@access     Private
+// @desc    Delete a bootcamp
+// @route   DELETE /api/v1/bootcamps/:id
+// @access  Private
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
-  try {
-    const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+  const bootcamp = await Bootcamp.findById(req.params.id);
 
-    if (!bootcamp) {
-      return next(
-        new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
-      );
-    }
-    res.status(200).json({ success: true, data: {} });
-  } catch (error) {
-    next(err);
+  if (!bootcamp) {
+    return next(
+      new ErrorResponse(
+        `Bootcamp that ends with '${req.params.id.slice(-6)}' was not found`,
+        404
+      )
+    );
   }
+
+  // // Make sure user is bootcamp owner
+  // if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+  //   return next(
+  //     new ErrorResponse(
+  //       `User with ID that ends with '${req.user.id.slice(
+  //         -6
+  //       )}' is not authorized to delete this bootcamp`,
+  //       401
+  //     )
+  //   );
+  // }
+
+  await bootcamp.deleteOne();
+
+  res.status(200).json({
+    success: true,
+    data: {},
+  });
 });
 //@desc       Get bootcamp within a radius
 //@route      Get /api/v1/bootcamps/radius/:zipcode/:distance
