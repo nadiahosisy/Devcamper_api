@@ -10,7 +10,7 @@ const CourseSchema = new mongoose.Schema({
     type: String,
     required: [true, "please add a description"],
   },
-  week: {
+  weeks: {
     type: String,
     required: [true, "please add a number of week"],
   },
@@ -19,8 +19,23 @@ const CourseSchema = new mongoose.Schema({
     required: [true, "please add a number of tuition cost"],
   },
   minimumSkill: {
-    type: Number,
+    type: String,
     required: [true, "please add a number of minimum skill"],
     enum: ["beginner", "intermediate", "advenced"],
   },
+  scholarshipAvailable: {
+    type: Boolean,
+    default: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  bootcamp: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Bootcamp",
+    required: true,
+  },
 });
+
+module.exports = mongoose.model("Course", CourseSchema);
