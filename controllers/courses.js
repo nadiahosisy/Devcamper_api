@@ -69,3 +69,65 @@ exports.addCourse = asyncHandler(async (req, res, next) => {
     data: course,
   });
 });
+
+//@desc       Update course
+//@route      PUT /api/vi/courses/:id
+//@access     Privet
+
+exports.updateCourse = asyncHandler(async (req, res, next) => {
+  let course = await Course.findById(req.params.id);
+  if (!course) {
+    return next(
+      new ErrorResponse(`No bootcamp with the id of ${req.params.id} `),
+      404
+    );
+  }
+  course = await Course.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    data: course,
+  });
+});
+
+//@desc       Delete course
+//@route      DELETE /api/vi/courses/:id
+//@access     Privet
+
+// @desc      Delete a course
+// @route     Delete /api/v1/courses/:id
+// @access    Private
+exports.deleteCourse = asyncHandler(async (req, res, next) => {
+  const course = await Course.findById(req.params.id);
+
+  if (!course) {
+    return next(
+      new ErrorResponse(
+        `Course that ends with '${req.params.id.slice(-6)}' was not found`,
+        404
+      )
+    );
+  }
+
+  // Make sure user is bootcamp owner
+  // if (course.user.toString() !== req.user.id && req.user.role !== "admin") {
+  //   return next(
+  //     new ErrorResponse(
+  //       `User with ID that ends with '${req.user.id.slice(
+  //         -6
+  //       )}' is not authorized to delete this course`,
+  //       401
+  //     )
+  //   );
+  // }
+
+  await course.deleteOne();
+
+  res.status(200).json({
+    success: true,
+    data: {},
+  });
+});
