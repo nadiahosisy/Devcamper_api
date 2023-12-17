@@ -25,13 +25,29 @@ exports.protect = asyncHandler(async (req, res, next) => {
   try {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
     console.log(decoded);
 
     req.user = await User.findById(decoded.id);
 
     next();
   } catch (error) {
-    return next(new ErrorResponse("Not authorize to access this route", 401));
+    return next(new ErrorResponse("Not authorized to access this route", 401));
   }
 });
+
+// Grant access to specific roles
+// Pass in a comma separated list of roles
+exports.authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ErrorResponse(
+          `User role '${req.user.role}' is not authorized to access this route`,
+          // Forbidden
+          403
+        )
+      );
+    }
+    next();
+  };
+};
