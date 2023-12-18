@@ -84,7 +84,9 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
   // Create reset url
   const resetUrl = `${req.protocol}://${req.get(
     "host"
-  )}/api/v1/resetpassword/${resetToken}`;
+  )}/api/v1/auth/resetpassword/${resetToken}`;
+
+  console.log(resetUrl);
 
   const message = `You are receiving this email because you need to confirm your email address. Please make a GET request to: \n\n ${resetUrl}`;
 
@@ -101,6 +103,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
+
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 
@@ -114,24 +117,37 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
   });
 });
 
-//@desc       Reset password
-//@route      PUT /api/vi/auth/resetpassword/:resettoken
-//@access     public
-
+// @desc      Reset password
+// @route     PUT /api/v1/auth/resetpassword/:resettoken
+// @access    Public
 exports.resetPassword = asyncHandler(async (req, res, next) => {
-  //Get hashed token
+  // Get hashed token
   const resetPasswordToken = crypto
     .createHash("sha256")
     .update(req.params.resettoken)
     .digest("hex");
-  const user = await User.findOne(req.user.id);
 
-  res.status(200).json({
-    success: true,
-    data: user,
+  console.log(req.params.resettoken);
+  console.log(resetPasswordToken);
+
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
   });
-});
+  console.log(user);
 
+  if (!user) {
+    return next(new ErrorResponse("Invalid token", 400));
+  }
+
+  // Set new password
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+
+  sendTokenResponse(user, 200, res);
+});
 //Get token from model,create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
   //Create token
